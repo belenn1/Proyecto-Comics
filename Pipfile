@@ -4,11 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = {extras = ["standard"], version = "*"}
-
-[scripts]
-dev = "fastapi dev main.py"
-start = "fastapi run main.py"
+requests = "*"
 
 [dev-packages]
 
