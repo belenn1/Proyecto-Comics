@@ -43,9 +43,9 @@ export default function ComicBrowser({
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-white font-bold">CV</span>
+                <span className="text-white font-bold">UC</span>
               </div>
-              <h1 className="text-3xl font-bold text-white">Comics</h1>
+              <h1 className="text-3xl font-bold text-white">UniversoComics</h1>
             </div>
             <button
               onClick={onCreatorClick}
