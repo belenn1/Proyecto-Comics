@@ -34,41 +34,38 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # es la ruta que me permite subir los pdf
 @app.post("/upload-pdf")
-async def upload_pdf(
-    file: UploadFile = File(...), titulo: str = "titulo", genero: str = "Comedia"
-):
+async def upload_pdf(file: UploadFile = File(...), titulo: str = "titulo", genero: str = "Comedia"):
 
-    #  Validar tipo
     if file.content_type != "application/pdf":
-        return JSONResponse(
-            status_code=400, content={"error": "Solo se permiten archivos PDF"}
-        )
+        return JSONResponse(status_code=400, content={"error": "Solo se permiten archivos PDF"})
 
-    max_size = 20 * 1024 * 1024  # 20MB
-
-    # Leer contenido UNA sola vez
+    max_size = 20 * 1024 * 1024
     contents = await file.read()
 
-    # Validar tamaño real
     if len(contents) > max_size:
-        return JSONResponse(
-            status_code=400, content={"error": "El archivo supera el límite de 20MB"}
-        )
+        return JSONResponse(status_code=400, content={"error": "El archivo supera el límite de 20MB"})
 
-    # Generar nombre único (evita sobreescritura)
     unique_filename = f"{uuid4()}_{file.filename}"
-    file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+    file_path = os.path.join("uploads", unique_filename)
 
-    # Guardar archivo físicamente
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-url = '127.0.0.1:8090/collections/comics/'
-payload = {'key1': 'value1', 'key2': 'value2'}
+        buffer.write(contents)
 
-# Send the POST request with form data
-response = requests.post(url, data=payload)
+    # subir a PocketBase
+    url = "http://127.0.0.1:8090/api/collections/comics/records"
+
+    files = {
+        "pdf": (unique_filename, contents, "application/pdf")#estoenvia el archivo pdf
+    }
+
+    data = {
+        "title": titulo,#son los campos q se van a mostrar
+        "genre": genero
+    }
+
+    response = requests.post(url, data=data, files=files)#le avise a pocketbase q el usuario inserto un nuwvo comic
+
     return {
         "message": "PDF subido correctamente",
-        "filename": unique_filename,
-        "path": file_path,
+        "pocketbase_response": response.json()
     }
